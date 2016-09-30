@@ -61,11 +61,13 @@ def sgd_momentum(w, dw, config=None):
   v = config.get('velocity', np.zeros_like(w))
   
   next_w = None
+  momentum, learning_rate = config['momentum'], config['learning_rate']
   #############################################################################
   # TODO: Implement the momentum update formula. Store the updated value in   #
   # the next_w variable. You should also use and update the velocity v.       #
   #############################################################################
-  pass
+  v = momentum * v - learning_rate * dw 
+  next_w = w + v 
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -93,13 +95,19 @@ def rmsprop(x, dx, config=None):
   config.setdefault('epsilon', 1e-8)
   config.setdefault('cache', np.zeros_like(x))
 
+  learning_rate = config['learning_rate']
+  decay_rate = config['decay_rate']
+  epsilon, cache = config['epsilon'], config['cache']
+
   next_x = None
   #############################################################################
   # TODO: Implement the RMSprop update formula, storing the next value of x   #
   # in the next_x variable. Don't forget to update cache value stored in      #  
   # config['cache'].                                                          #
   #############################################################################
-  pass
+  cache = decay_rate * cache + (1 - decay_rate) * dx**2
+  next_x = x - learning_rate * dx / (np.sqrt(cache) + epsilon)
+  config['cache'] = cache
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -131,12 +139,27 @@ def adam(x, dx, config=None):
   config.setdefault('t', 0)
   
   next_x = None
+  learning_rate = config['learning_rate']
+  beta1, beta2 = config['beta1'], config['beta2']
+  epsilon = config['epsilon']
+  m, v, t = config['m'], config['v'], config['t']
   #############################################################################
   # TODO: Implement the Adam update formula, storing the next value of x in   #
   # the next_x variable. Don't forget to update the m, v, and t variables     #
   # stored in config.                                                         #
   #############################################################################
-  pass
+  t += 1
+  m = beta1*m + (1-beta1)*dx
+  v = beta2*v + (1-beta2)*(dx**2)
+
+  m_t = m/(1-beta1**t)
+  v_t = v/(1-beta2**t)
+
+  next_x = x - learning_rate * m_t / (np.sqrt(v_t) + epsilon)
+   
+  config['m'] = m 
+  config['v'] = v
+  config['t'] = t 
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -144,6 +167,3 @@ def adam(x, dx, config=None):
   return next_x, config
 
   
-  
-  
-
