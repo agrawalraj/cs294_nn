@@ -184,8 +184,9 @@ class FullyConnectedNet(object):
     gamma = {'gamma' + str(i + 1):  np.ones(full_dims[i + 1]) for i in num_layers3}
     self.params.update(b)
     self.params.update(W)
-    self.params.update(beta)
-    self.params.update(gamma)
+    if self.use_batchnorm:
+      self.params.update(beta)
+      self.params.update(gamma)
     ############################################################################
     #                             END OF YOUR CODE                             #
     ############################################################################
